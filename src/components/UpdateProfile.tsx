@@ -8,33 +8,35 @@ export default function UpdateProfile() {
     const emailRef = useRef<HTMLInputElement>(null);
     const passwordConfirmRef = useRef<HTMLInputElement>(null);
     const passwordRef = useRef<HTMLInputElement>(null);
-    const authContext = useAuth();
+    const { updatePassword, updateEmail, currentUser } = useAuth();
     const [error, setError] = useState<string | null>();
     const [loading, setLoading] = useState<boolean>(false);
 
     async function handleSubmit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
 
-        if (
-            passwordRef?.current?.value !== passwordConfirmRef?.current?.value
-        ) {
+        // Should just redirect out of here if we don't have a current user.
+        if (!currentUser) {
+            return;
+        }
+
+        const email = emailRef.current?.value;
+        const password = passwordRef.current?.value;
+        const passwordConfirm = passwordConfirmRef.current?.value;
+
+        if (password && passwordConfirm && password !== passwordConfirm) {
             setError("Password and confirm password must match");
             return;
         }
 
         const promises = [];
 
-        if (
-            emailRef.current?.value &&
-            emailRef.current?.value !== authContext?.currentUser?.email
-        ) {
-            promises.push(authContext?.updateEmail(emailRef.current?.value));
+        if (email && email !== currentUser.email) {
+            promises.push(updateEmail(email));
         }
 
-        if (passwordRef.current?.value) {
-            promises.push(
-                authContext?.updatePassword(passwordRef.current?.value)
-            );
+        if (password) {
+            promises.push(updatePassword(passwordRef.current?.value));
         }
 
         Promise.all(promises)

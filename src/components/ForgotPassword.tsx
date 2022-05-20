@@ -1,5 +1,5 @@
 import { FormEvent, useRef, useState } from "react";
-import { Card, Form, Button, Alert } from "react-bootstrap";
+import { Alert, Button, Card, Form } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { ButtonBusyIndicator } from "./ButtonBusyIndicator";
@@ -7,23 +7,25 @@ import { ButtonBusyIndicator } from "./ButtonBusyIndicator";
 export default function ForgotPassword() {
     const emailRef = useRef<HTMLInputElement>(null);
     const authContext = useAuth();
-    const [error, setError] = useState<string | null>();
+    const [error, setError] = useState<string | null>("");
     const [loading, setLoading] = useState<boolean>(false);
     const [message, setMessage] = useState<string | null>();
 
     async function handleSubmit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
 
+        const email = emailRef?.current?.value;
+
+        if (!email) {
+            setError("Please enter a valid email address.");
+            return;
+        }
+
         try {
             setError(null);
             setLoading(true);
 
-            const email = emailRef?.current?.value;
-
-            if (email && authContext) {
-                await authContext.resetPassword(email);
-            }
-
+            await authContext.resetPassword(email);
             setMessage("Check your email for further instructions.");
         } catch (e: any) {
             console.log(e);

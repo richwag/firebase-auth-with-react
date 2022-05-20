@@ -1,30 +1,38 @@
-import { FormEvent, useRef, useState } from "react";
-import { Card, Form, Button, Alert } from "react-bootstrap";
+import { FormEvent, useState } from "react";
+import { Alert, Button, Card, Form } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { ButtonBusyIndicator } from "./ButtonBusyIndicator";
 
+interface IFormFields {
+    email: string;
+    password: string;
+}
+
 export default function Login() {
-    const emailRef = useRef<HTMLInputElement>(null);
-    const passwordRef = useRef<HTMLInputElement>(null);
-    const authContext = useAuth();
+    const { login } = useAuth();
     const [error, setError] = useState<string | null>();
     const [loading, setLoading] = useState<boolean>(false);
     const navigate = useNavigate();
+    const [form, setForm] = useState({} as IFormFields);
+
+    const setField = (field: string, value: string) => {
+        setForm({
+            ...form,
+            [field]: value,
+        });
+    };
 
     async function handleSubmit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
+
+        const { email, password } = form;
 
         try {
             setError(null);
             setLoading(true);
 
-            const email = emailRef?.current?.value;
-            const password = passwordRef.current?.value;
-
-            if (email && password && authContext) {
-                await authContext.login(email, password);
-            }
+            await login(email, password);
             navigate("/");
         } catch (e: any) {
             console.log(e);
@@ -50,7 +58,9 @@ export default function Login() {
                             <Form.Label>Email</Form.Label>
                             <Form.Control
                                 type="email"
-                                ref={emailRef}
+                                onChange={(e) =>
+                                    setField("email", e.target.value)
+                                }
                                 required
                             ></Form.Control>
                         </Form.Group>
@@ -58,10 +68,13 @@ export default function Login() {
                             <Form.Label>Password</Form.Label>
                             <Form.Control
                                 type="password"
-                                ref={passwordRef}
+                                onChange={(e) =>
+                                    setField("password", e.target.value)
+                                }
                                 required
                             ></Form.Control>
                         </Form.Group>
+
                         <Button
                             className="w-100 mt-3"
                             type="submit"
