@@ -6,7 +6,7 @@ import { ButtonBusyIndicator } from "./ButtonBusyIndicator";
 
 export default function ForgotPassword() {
     const emailRef = useRef<HTMLInputElement>(null);
-    const authContext = useAuth();
+    const { resetPassword } = useAuth();
     const [error, setError] = useState<string | null>("");
     const [loading, setLoading] = useState<boolean>(false);
     const [message, setMessage] = useState<string | null>();
@@ -25,7 +25,7 @@ export default function ForgotPassword() {
             setError(null);
             setLoading(true);
 
-            await authContext.resetPassword(email);
+            await resetPassword(email);
             setMessage("Check your email for further instructions.");
         } catch (e: any) {
             console.log(e);
