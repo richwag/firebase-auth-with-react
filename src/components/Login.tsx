@@ -15,6 +15,7 @@ export default function Login() {
     const [loading, setLoading] = useState<boolean>(false);
     const navigate = useNavigate();
     const [form, setForm] = useState({} as IFormFields);
+    const [validated, setValidated] = useState<boolean>(false);
 
     const setField = (field: string, value: string) => {
         setForm({
@@ -25,6 +26,11 @@ export default function Login() {
 
     async function handleSubmit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
+        setValidated(true);
+
+        if (!e.currentTarget.checkValidity()) {
+            return;
+        }
 
         const { email, password } = form;
 
@@ -52,7 +58,11 @@ export default function Login() {
             <Card className="mb-4">
                 <Card.Body>
                     <h2 className="text-center mb-4">Log In</h2>
-                    <Form onSubmit={handleSubmit}>
+                    <Form
+                        onSubmit={handleSubmit}
+                        noValidate
+                        validated={validated}
+                    >
                         {error && <Alert variant="danger">{error}</Alert>}
                         <Form.Group id="email">
                             <Form.Label>Email</Form.Label>
@@ -63,6 +73,9 @@ export default function Login() {
                                 }
                                 required
                             ></Form.Control>
+                            <Form.Control.Feedback type="invalid">
+                                Must be a valid email address
+                            </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group id="password">
                             <Form.Label>Password</Form.Label>
@@ -73,6 +86,9 @@ export default function Login() {
                                 }
                                 required
                             ></Form.Control>
+                            <Form.Control.Feedback type="invalid">
+                                Password is required
+                            </Form.Control.Feedback>
                         </Form.Group>
 
                         <Button

@@ -13,7 +13,9 @@ export default function UpdateProfile() {
     const [email, setEmail] = useState<string | null>();
     const [password, setPassword] = useState<string | null>();
     const [passwordConfirm, setPasswordConfirm] = useState<string | null>();
+    const [validated, setValidated] = useState(false);
 
+    // Validate passwords match when either of them change.
     useEffect(() => {
         if (
             password &&
@@ -30,6 +32,8 @@ export default function UpdateProfile() {
 
     async function handleSubmit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
+
+        setValidated(true);
 
         if (!e.currentTarget.checkValidity()) {
             return;
@@ -71,7 +75,11 @@ export default function UpdateProfile() {
             <Card className="mb-4">
                 <Card.Body>
                     <h2 className="text-center mb-4">Update Profile</h2>
-                    <Form onSubmit={handleSubmit} noValidate validated={true}>
+                    <Form
+                        onSubmit={handleSubmit}
+                        noValidate
+                        validated={validated}
+                    >
                         {error && <Alert variant="danger">{error}</Alert>}
                         <Form.Group id="email">
                             <Form.Label>Email</Form.Label>

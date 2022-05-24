@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { Alert, Button, Card, Form } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
@@ -12,12 +12,28 @@ export default function Signup() {
     const [error, setError] = useState<string | null>();
     const [loading, setLoading] = useState<boolean>(false);
     const navigate = useNavigate();
+    const [validated, setValidated] = useState(false);
+    const passwordConfirmRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        if (
+            password &&
+            password.length &&
+            (!passwordConfirm || password.localeCompare(passwordConfirm))
+        ) {
+            passwordConfirmRef?.current?.setCustomValidity(
+                "Passwords must match"
+            );
+        } else {
+            passwordConfirmRef?.current?.setCustomValidity("");
+        }
+    }, [password, passwordConfirm]);
 
     async function handleSubmit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
+        setValidated(true);
 
-        if (password !== passwordConfirm) {
-            setError("Password and confirm password must match");
+        if (!e.currentTarget.checkValidity()) {
             return;
         }
 
@@ -45,7 +61,11 @@ export default function Signup() {
             <Card className="mb-4">
                 <Card.Body>
                     <h2 className="text-center mb-4">Sign Up</h2>
-                    <Form onSubmit={handleSubmit}>
+                    <Form
+                        onSubmit={handleSubmit}
+                        noValidate
+                        validated={validated}
+                    >
                         {error && <Alert variant="danger">{error}</Alert>}
                         <Form.Group id="email">
                             <Form.Label>Email</Form.Label>
@@ -54,6 +74,9 @@ export default function Signup() {
                                 required
                                 onChange={(e) => setEmail(e.target.value)}
                             ></Form.Control>
+                            <Form.Control.Feedback type="invalid">
+                                Must be a valid email address
+                            </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group id="password">
                             <Form.Label>Password</Form.Label>
@@ -68,10 +91,14 @@ export default function Signup() {
                             <Form.Control
                                 type="password"
                                 required
+                                ref={passwordConfirmRef}
                                 onChange={(e) =>
                                     setPasswordConfirm(e.target.value)
                                 }
                             ></Form.Control>
+                            <Form.Control.Feedback type="invalid">
+                                Passwords must match
+                            </Form.Control.Feedback>
                         </Form.Group>
                         <Button
                             className="w-100 mt-3"
