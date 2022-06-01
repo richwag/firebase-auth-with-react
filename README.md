@@ -1,6 +1,6 @@
 # Overview
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app). It's a React app to demo registering, logging in, forgetton password against the firebase user authorization.
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app). It's a React app to demo registering, logging in, forgotten password and user profile update against the firebase user authorization.
 
 ## Available Scripts
 
